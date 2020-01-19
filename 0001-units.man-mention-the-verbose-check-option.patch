@@ -1,0 +1,26 @@
+From f43447efb1b382f90506dfbe745de00e32f1d615 Mon Sep 17 00:00:00 2001
+From: Kamil Dudka <kdudka@redhat.com>
+Date: Mon, 20 May 2013 15:17:32 +0200
+Subject: [PATCH] units.man: mention the --verbose-check option
+
+... as an alias to --check-verbose since units --help mentions it
+---
+ units.man |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/units.man b/units.man
+index d1762b5..483e1e4 100644
+--- a/units.man
++++ b/units.man
+@@ -1627,7 +1627,7 @@ in the current locale are checked.  You should always run
+ with this option after modifying a units data file.
+ .PP
+ .TP
+-.BR "-\^-\^check-verbose"
++.BR "-\^-\^check-verbose" ", " "-\^-\^verbose-check"
+ Like the
+ .CQ "--check"
+ option, this option prints a list of units that
+-- 
+1.7.1
+

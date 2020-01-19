@@ -1,0 +1,93 @@
+#!/usr/bin/python
+
+import urllib
+import datetime
+from xml.dom import minidom
+import sys
+import re
+
+outfile = 'currency.units'
+
+if len(sys.argv)==2:
+  outfile = sys.argv[1]
+elif len(sys.argv)>2:
+  sys.stderr.write('Usage: {0} [filename]\n\n'.format(sys.argv[0]))
+  sys.stderr.write('Update currency information for \'units\' into the specified\n')
+  sys.stderr.write('filename or the default location, \'{0}\'.\n'.format(outfile))
+  sys.exit(1)
+
+try:
+  if outfile == '-':
+    output = sys.stdout
+  else:
+    output = open(outfile,'w')
+except IOError, exc:
+  sys.stderr.write('Unable to write to output file. {0}\n'.format(exc))
+  sys.exit(1)
+
+try:
+  data = urllib.urlopen('http://rss.timegenie.com/forex.txt').readlines()
+except IOError, exc:
+  sys.stderr.write('Error connecting to currency server. {0}\n'.format(exc))
+  sys.exit(1)
+
+if not re.match(r"[A-Z]{3}\|[A-Za-z ]*\|[0-9.]*",data[0]):
+  sys.stderr.write('Something wrong with timegenie reply\n')
+  sys.exit(1)
+
+splitdata = [x.split('|') for x in data]
+
+codes = [x[0] for x in splitdata]
+names = [x[1].lower().replace(' ','') for x in splitdata]
+values = ['1|' + x[2].rstrip('\n') for x in splitdata]
+
+
+# print codes here
+
+output.write('# ISO Currency Codes\n\n')
+
+for x in zip(codes, names):
+  output.write(('{0}' + ' '*20 + '{1}\n').format(*x))
+
+usd = codes.index('USD')
+euro = codes.index('EUR')
+usdval = values[usd][2:]    # Trim off leading 1|
+
+values = [x+' euro' for x in values]
+
+values[euro] = usdval + ' US$'
+
+del names[usd]
+del values[usd]
+
+# print values here
+
+now = datetime.datetime.now()
+output.write('\n# Currency exchange rates from Time Genie (www.timegenie.com)\n')
+output.write('\n!message Currency exchange rates from ' + now.strftime('%Y-%m-%d') + '\n\n')
+
+maxlen = max(map(len,names))
+names = [x.ljust(maxlen+2) for x in names]
+for x in zip(names, values):
+  output.write('{0}{1}\n'.format(*x))
+
+
+output.write('\n# Precious metals prices from http://services.packetizer.com/spotprices/\n\n')
+
+try:
+  dom = minidom.parse(urllib.urlopen('http://services.packetizer.com/spotprices/?f=xml'))
+except IOError, exc:
+  sys.stderr.write('Error connecting to spotprices server. {0}\n'.format(exc))
+  sys.exit(1)
+
+metals = ['gold','platinum','silver']
+
+for metal in metals:
+  thismetal = dom.getElementsByTagName(metal)[0].firstChild.nodeValue
+  output.write('{0}    {1} US$/troyounce\n'.format((metal+'price').ljust(15), thismetal))
+
+
+# Another source for this data might be 
+# http://www.xmlcharts.com/cache/precious-metals.xml
+
+
