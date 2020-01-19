@@ -1,7 +1,7 @@
 Summary: A utility for converting amounts from one unit to another
 Name: units
 Version: 2.01
-Release: 3%{?dist}
+Release: 5%{?dist}
 Source: ftp://ftp.gnu.org/gnu/units/%{name}-%{version}.tar.gz
 URL: http://www.gnu.org/software/units/units.html
 License: GPLv3+
@@ -58,6 +58,12 @@ fi
 %{_mandir}/man1/*
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 2.01-5
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 2.01-4
+- Mass rebuild 2013-12-27
+
 * Mon May 20 2013 Kamil Dudka <kdudka@redhat.com> - 2.01-3
 - provide a man page for units_cur as a symlink to units.1
 - mention the --check-verbose option in units.1 man page
